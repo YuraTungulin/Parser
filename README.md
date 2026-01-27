@@ -1,6 +1,6 @@
-# Woza Exchange Parser
+# Exchange Parser
 
-Pet project for parsing USDT ↔ cash exchange rates
+Pet project for parsing USDT - cash exchange rates
 from woza.exchange using Playwright.
 
 ## What it does
@@ -18,17 +18,14 @@ from woza.exchange using Playwright.
 pip install -r requirements.txt
 playwright install
 python main.py
+```
 
-
-Project status
+## Project status
 
 The project was built as a learning exercise.
 The logic may change as the website updates.
 
-Future improvements
-
-Better error handling
-
-Logging instead of print
-
-Configurable city list
+## Future improvements
+- Better error handling
+- Logging instead of print
+- Configurable city list
