@@ -93,14 +93,14 @@ def parse_rates():
         browser = p.chromium.launch(headless=True)
 
         page = browser.new_page()
-        page.goto("https://woza.exchange/exchange", timeout=60000)
+        page.goto("https://URL.exchange/exchange", timeout=60000)
         page.wait_for_load_state("networkidle")
         usdt_to_cash = get_usdt_to_cash(page)
         result["USDT-CASH"] = usdt_to_cash
         page.close()
 
         page = browser.new_page()
-        page.goto("https://woza.exchange/exchange", timeout=60000)
+        page.goto("https://URL.exchange/exchange", timeout=60000)
         page.wait_for_load_state("networkidle")
         result["CASH-USDT"] = get_cash_to_usdt(usdt_to_cash, page)
         page.close()
