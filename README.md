@@ -1,7 +1,7 @@
 # Exchange Parser
 
 Pet project for parsing USDT - cash exchange rates
-from woza.exchange using Playwright.
+from any.exchange using Playwright.
 
 ## What it does
 - Parses USDT → cash exchange rates
