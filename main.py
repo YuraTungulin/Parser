@@ -2,9 +2,33 @@ from playwright.sync_api import sync_playwright
 import re
 import time
 
-RUS_CITIES = ["Москва", "Санкт-Петербург", "Краснодар", "Сочи", "Пятигорск"]
-UKR_CITIES = ["Киев", "Днепр", "Черновцы", "Житомир", "Одесса"]
-CITIES = RUS_CITIES + UKR_CITIES
+# Города
+RUS_CITIES = [
+    "Москва",
+    "Санкт-Петербург",
+    "Краснодар",
+    "Сочи",
+    "Пятигорск",
+    "Ростов-на-Дону"
+]
+
+UKR_CITIES = [
+    "Киев",
+    "Днепр",
+    "Черновцы",
+    "Житомир",
+    "Одесса"
+]
+
+EU_CITIES = [
+    "Вена",
+    "Варшава",
+    "Бухарест",
+    "Прага",
+    "София"
+]
+
+CITIES = RUS_CITIES + UKR_CITIES + EU_CITIES
 
 
 def get_usdt_to_cash(page):
@@ -20,13 +44,19 @@ def get_usdt_to_cash(page):
         page.locator(".field-item-info span", has_text=city).first.click()
         time.sleep(0.5)
 
-        if city in UKR_CITIES:
+        # Украина + Европа
+        if city in UKR_CITIES or city in EU_CITIES:
             block = page.locator(".exchanger-item.get").first
             block.locator(".field-coin-head-content").click()
             time.sleep(0.5)
-            block.locator("._option_g1521_216", has_text="UAH").first.click()
+
+            currency = "UAH" if city in UKR_CITIES else "EUR"
+            block.locator("._option_g1521_216", has_text=currency).first.click()
             time.sleep(0.5)
+
             text = block.locator(".commission").inner_text()
+
+        # Россия
         else:
             commission = page.locator(".commission")
             commission.wait_for(timeout=15000)
@@ -60,12 +90,20 @@ def get_cash_to_usdt(usdt_to_cash, page):
         page.click(".field-coin-head-content")
         time.sleep(0.3)
 
-        currency = "UAH" if city in UKR_CITIES else "RUB"
+        currency = (
+            "UAH" if city in UKR_CITIES
+            else "EUR" if city in EU_CITIES
+            else "RUB"
+        )
+
         page.locator("._option_g1521_216", has_text=currency).first.click()
         time.sleep(0.3)
 
-        if city in UKR_CITIES:
-            value = round(usdt_to_cash[city] * 1.022, 3)
+        # Украина + Европа → коэффициент
+        if city in UKR_CITIES or city in EU_CITIES:
+            value = round(usdt_to_cash[city] * 1.028, 3)
+
+        # Россия → через ошибку
         else:
             input_field = page.locator("input[placeholder='0.00']").first
             input_field.fill("1")
@@ -93,14 +131,14 @@ def parse_rates():
         browser = p.chromium.launch(headless=True)
 
         page = browser.new_page()
-        page.goto("https://URL.exchange/exchange", timeout=60000)
+        page.goto("https://EXCHANGE.exchange/exchange", timeout=60000)
         page.wait_for_load_state("networkidle")
         usdt_to_cash = get_usdt_to_cash(page)
         result["USDT-CASH"] = usdt_to_cash
         page.close()
 
         page = browser.new_page()
-        page.goto("https://URL.exchange/exchange", timeout=60000)
+        page.goto("https://EXCHANGE.exchange/exchange", timeout=60000)
         page.wait_for_load_state("networkidle")
         result["CASH-USDT"] = get_cash_to_usdt(usdt_to_cash, page)
         page.close()
@@ -114,3 +152,4 @@ if __name__ == "__main__":
     rates = parse_rates()
     print("\nRESULT:")
     print(rates)
+
